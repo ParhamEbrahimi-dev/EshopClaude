@@ -10,8 +10,4 @@
     <ProjectReference Include="..\EshopClaude.ServiceDefaults\EshopClaude.ServiceDefaults.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.15" />
-  </ItemGroup>
-
 </Project>
