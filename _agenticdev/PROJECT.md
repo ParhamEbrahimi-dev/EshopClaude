@@ -2,6 +2,10 @@
 
 A minimal e-commerce demo built to show agentic coding with microservices: small scope, few tokens, fast delivery. Built on the .NET Aspire starter solution in `src/`.
 
+## Workflow
+
+One feature branch per `PLAN.md` step, merged back to `main` only once that step's verification passes. `main` must always stay green (builds clean, Aspire run healthy) — never commit a broken intermediate state directly to it.
+
 ## Goals / non-goals
 
 **In scope:** list products, add to cart, checkout, view order (including order history).

@@ -2,6 +2,10 @@
 
 Source of truth for scope/design: `_agenticdev/PROJECT.md`. This plan sequences the work into small, branch-sized steps. No code here — tasks and verification only.
 
+## Workflow
+
+Each numbered step below is done on its own feature branch, created off `main`. A step's branch is only merged back to `main` after its "Verify" checklist passes in full. `main` must stay green at all times — if a step turns out to need splitting, split it into further branches rather than merging partial/broken work.
+
 Legend for verification:
 - **Build** — `dotnet build` on the solution (or affected projects).
 - **Aspire run** — `dotnet run` on `EshopClaude.AppHost`, check the Aspire dashboard (resources healthy, logs clean).
