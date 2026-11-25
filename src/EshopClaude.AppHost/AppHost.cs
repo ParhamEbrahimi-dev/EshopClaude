@@ -1,5 +1,23 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
+var postgres = builder.AddPostgres("postgres")
+    .WithPgAdmin(pgAdmin =>
+    {
+        // pgAdmin binds to IPv6 only by default; Aspire's proxy and health check use IPv4.
+        pgAdmin.WithEnvironment("PGADMIN_LISTEN_ADDRESS", "0.0.0.0");
+
+        // Aspire hides pgAdmin by default; show it in the dashboard's resource list.
+        foreach (var hidden in pgAdmin.Resource.Annotations.OfType<HiddenAnnotation>().ToList())
+        {
+            pgAdmin.Resource.Annotations.Remove(hidden);
+        }
+    });
+
+postgres.AddDatabase("catalogdb");
+postgres.AddDatabase("orderingdb");
+
+builder.AddRedis("redis");
+
 builder.AddDotnetProject("catalogapi", "../EshopClaude.Catalog.Api/EshopClaude.Catalog.Api.csproj")
     .WithHttpHealthCheck("/health");
 

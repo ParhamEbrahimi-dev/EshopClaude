@@ -39,19 +39,72 @@ Create the three microservice projects and wire the AppHost, without business lo
 
 Add the Postgres and Redis resources, EF Core wiring for the two databases, pgAdmin, and Catalog seed data. No business endpoints yet — just persistence plumbing and a provable connection.
 
-**Tasks:**
-1. In `EshopClaude.AppHost`: add a single Postgres server resource with `WithPgAdmin()`, add two database resources `catalogdb` and `orderingdb` off of it, add a Redis resource.
-2. Wire `Catalog.Api` → `catalogdb` reference, `Ordering.Api` → `orderingdb` reference, `Basket.Api` → Redis reference (`WithReference` + `WaitFor` in AppHost; client integration packages in each service).
-3. Add EF Core `DbContext` to `Catalog.Api` (Product entity per PROJECT.md) and to `Ordering.Api` (Order + OrderItem entities), using Aspire's Postgres EF Core integration.
-4. Add Catalog seed data (6–8 products) applied at `Catalog.Api` startup (e.g. `EnsureCreated`/migration + seeding on startup).
-5. Add Redis client wiring in `Basket.Api` (no schema — just connection).
+Split into sub-steps, each on its own feature branch and merged only after its own Verify list passes.
 
-**Projects touched:** `EshopClaude.AppHost`, `Catalog.Api`, `Ordering.Api`, `Basket.Api`.
+### 2a. AppHost data infrastructure
+
+**Tasks:**
+1. In `EshopClaude.AppHost`: add the `Aspire.Hosting.PostgreSQL` and `Aspire.Hosting.Redis` hosting packages.
+2. Add a single Postgres server resource with `WithPgAdmin()`, and two database resources `catalogdb` and `orderingdb` off of it.
+3. Add a Redis resource (no data volume).
+4. Add client integration packages only (no code): `Aspire.Npgsql.EntityFrameworkCore.PostgreSQL` in `Catalog.Api` and `Ordering.Api`, `Aspire.StackExchange.Redis` in `Basket.Api`.
+5. No `WithReference`/`WaitFor` between the API resources and the data resources yet.
+
+**Projects touched:** `EshopClaude.AppHost`, `Catalog.Api`, `Ordering.Api`, `Basket.Api` (csproj only).
 
 **Verify:**
 - Build: solution builds clean.
-- Aspire run: Postgres, pgAdmin, Redis, and all services show healthy in the dashboard.
-- pgAdmin: browse to pgAdmin UI, confirm `catalogdb` has the seeded products table populated, `orderingdb` exists with the (empty) orders schema.
+- Aspire run: postgres, pgadmin, `catalogdb`, `orderingdb`, redis, and all services show healthy in the dashboard.
+- pgAdmin: the Postgres server is listed with `catalogdb` and `orderingdb` (both empty).
+- Redis: `redis-cli PING` in the container returns `PONG`; no volume mounted.
+
+### 2b. Catalog persistence
+
+**Tasks:**
+1. Add the Product entity (per PROJECT.md) and a `CatalogDbContext` in `Catalog.Api`, registered with `AddNpgsqlDbContext`.
+2. AppHost: `Catalog.Api` → `WithReference(catalogdb)` + `WaitFor`.
+3. Create the schema at startup (e.g. `EnsureCreated`/migration).
+
+**Projects touched:** `EshopClaude.AppHost`, `Catalog.Api`.
+
+**Verify:**
+- Build. Aspire run: all resources healthy.
+- pgAdmin: `catalogdb` contains the products table.
+
+### 2c. Catalog seed data
+
+**Tasks:**
+1. Seed 6–8 products at `Catalog.Api` startup (only when the table is empty).
+
+**Projects touched:** `Catalog.Api`.
+
+**Verify:**
+- Build. Aspire run: all resources healthy.
+- pgAdmin: the products table is populated; restarting does not duplicate rows.
+
+### 2d. Ordering persistence
+
+**Tasks:**
+1. Add Order + OrderItem entities and an `OrderingDbContext` in `Ordering.Api`, registered with `AddNpgsqlDbContext`.
+2. AppHost: `Ordering.Api` → `WithReference(orderingdb)` + `WaitFor`.
+3. Create the schema at startup.
+
+**Projects touched:** `EshopClaude.AppHost`, `Ordering.Api`.
+
+**Verify:**
+- Build. Aspire run: all resources healthy.
+- pgAdmin: `orderingdb` contains the (empty) orders and order items tables.
+
+### 2e. Basket Redis connection
+
+**Tasks:**
+1. Register the Redis client in `Basket.Api` with `AddRedisClient` (no schema — just connection).
+2. AppHost: `Basket.Api` → `WithReference(redis)` + `WaitFor`.
+
+**Projects touched:** `EshopClaude.AppHost`, `Basket.Api`.
+
+**Verify:**
+- Build. Aspire run: all resources healthy, `basketapi` health check includes Redis and passes.
 - Traces: none yet (no cross-service calls).
 
 ---
