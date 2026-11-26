@@ -30,3 +30,9 @@ Run from `src/`:
 - Foundation work is committed on `main`. From the first spec, one spec is one sub-feature on one feature branch, merged with a pull request.
 - Before committing, the solution must build and `aspire run` must start every resource healthy.
 - Detailed scope lives in `_agenticdev/PROJECT.md` and build order in `_agenticdev/PLAN.md`. Reference them, don't copy them.
+
+## Way of working
+
+The spec-driven delivery rules live in `_agenticdev/WOW.md`.
+
+@_agenticdev/WOW.md
