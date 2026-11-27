@@ -13,12 +13,14 @@ var postgres = builder.AddPostgres("postgres")
         }
     });
 
-postgres.AddDatabase("catalogdb");
+var catalogdb = postgres.AddDatabase("catalogdb");
 postgres.AddDatabase("orderingdb");
 
 builder.AddRedis("redis");
 
 builder.AddDotnetProject("catalogapi", "../EshopClaude.Catalog.Api/EshopClaude.Catalog.Api.csproj")
+    .WithReference(catalogdb)
+    .WaitFor(catalogdb)
     .WithHttpHealthCheck("/health");
 
 builder.AddDotnetProject("basketapi", "../EshopClaude.Basket.Api/EshopClaude.Basket.Api.csproj")
