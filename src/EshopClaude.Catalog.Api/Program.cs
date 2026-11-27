@@ -12,6 +12,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
     db.Database.EnsureCreated();
+    CatalogSeed.Seed(db);
 }
 
 app.MapGet("/", () => "Catalog API is running.");
