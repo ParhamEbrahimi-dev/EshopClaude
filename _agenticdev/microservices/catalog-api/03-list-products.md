@@ -1,10 +1,16 @@
 # Catalog.Api — 03 — List products
 
-**Status:** Not started
+**Status:** Done
 
 ## Goal
 
 Expose the whole catalog over HTTP, so the storefront home page can list it.
+
+## Context
+
+- The endpoint is a minimal API mapped in `Program.cs`, injecting `CatalogDbContext`.
+- It returns the `Product` entity as JSON (camelCase: `id`, `name`, `description`, `price`, `imageUrl`). No DTO: the entity's fields are exactly the PROJECT.md fields.
+- The query is read-only (`AsNoTracking`) and ordered by `Id` for a stable order. That is not a user-facing sorting option.
 
 ## Depends on
 
@@ -23,7 +29,7 @@ catalog-api/02-seed-products
 
 - `dotnet build` passes.
 - `aspire run`: every resource is healthy.
-- HTTP: `GET /products` returns 200 with all seeded products and every PROJECT.md field.
+- HTTP: `GET http://localhost:<catalogapi port>/products` returns `200` with a JSON array of the 8 seeded products, each with `id`, `name`, `description`, `price`, `imageUrl`.
 
 ## References
 
