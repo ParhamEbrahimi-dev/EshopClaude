@@ -1,0 +1,13 @@
+@CatalogApi_HostAddress = http://localhost:5101
+
+### List products — expect 200 with the 8 seeded products
+GET {{CatalogApi_HostAddress}}/products
+Accept: application/json
+
+### Get product by id — expect 200 with product 1 (Classic Mug)
+GET {{CatalogApi_HostAddress}}/products/1
+Accept: application/json
+
+### Get product by unknown id — expect 404
+GET {{CatalogApi_HostAddress}}/products/9999
+Accept: application/json
