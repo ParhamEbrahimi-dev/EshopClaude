@@ -58,122 +58,53 @@ Split into sub-steps, each on its own feature branch and merged only after its o
 - pgAdmin: the Postgres server is listed with `catalogdb` and `orderingdb` (both empty).
 - Redis: `redis-cli PING` in the container returns `PONG`; no volume mounted.
 
-### 2b. Catalog persistence
+### 2b–2e. Moved to the spec backlog
 
-**Tasks:**
-1. Add the Product entity (per PROJECT.md) and a `CatalogDbContext` in `Catalog.Api`, registered with `AddNpgsqlDbContext`.
-2. AppHost: `Catalog.Api` → `WithReference(catalogdb)` + `WaitFor`.
-3. Create the schema at startup (e.g. `EnsureCreated`/migration).
-
-**Projects touched:** `EshopClaude.AppHost`, `Catalog.Api`.
-
-**Verify:**
-- Build. Aspire run: all resources healthy.
-- pgAdmin: `catalogdb` contains the products table.
-
-### 2c. Catalog seed data
-
-**Tasks:**
-1. Seed 6–8 products at `Catalog.Api` startup (only when the table is empty).
-
-**Projects touched:** `Catalog.Api`.
-
-**Verify:**
-- Build. Aspire run: all resources healthy.
-- pgAdmin: the products table is populated; restarting does not duplicate rows.
-
-### 2d. Ordering persistence
-
-**Tasks:**
-1. Add Order + OrderItem entities and an `OrderingDbContext` in `Ordering.Api`, registered with `AddNpgsqlDbContext`.
-2. AppHost: `Ordering.Api` → `WithReference(orderingdb)` + `WaitFor`.
-3. Create the schema at startup.
-
-**Projects touched:** `EshopClaude.AppHost`, `Ordering.Api`.
-
-**Verify:**
-- Build. Aspire run: all resources healthy.
-- pgAdmin: `orderingdb` contains the (empty) orders and order items tables.
-
-### 2e. Basket Redis connection
-
-**Tasks:**
-1. Register the Redis client in `Basket.Api` with `AddRedisClient` (no schema — just connection).
-2. AppHost: `Basket.Api` → `WithReference(redis)` + `WaitFor`.
-
-**Projects touched:** `EshopClaude.AppHost`, `Basket.Api`.
-
-**Verify:**
-- Build. Aspire run: all resources healthy, `basketapi` health check includes Redis and passes.
-- Traces: none yet (no cross-service calls).
+Catalog persistence, Catalog seed data, Ordering persistence and the Basket Redis connection are now specs in Step 3: `catalog-api/01`, `catalog-api/02`, `ordering-api/01` and `basket-api/01`.
 
 ---
 
-## Step 3 — Microservices, one by one
+## Step 3 — Microservices, spec by spec
 
-Build each service's real endpoints against its own data store, independently testable via HTTP before any service-to-service calls exist.
+Each service is built as a sequence of small specs, one feature branch per spec, following `_agenticdev/WOW.md`. Scope, non-goals and Definition of Done live in the spec files, and status lives in `_agenticdev/microservices/README.md`.
+
+**Build order:** specs run in number order inside each service. Across services, `basket-api/03-add-item` needs `catalog-api/04-get-product`, and `basket-api/04-checkout` needs `ordering-api/02-create-order`. Suggested sequence: Catalog, then Ordering, then Basket.
 
 ### 3a. Catalog.Api
 
-**Tasks:**
-1. Implement `GET /products` (list all).
-2. Implement `GET /products/{id}` (single product, 404 if missing).
+**Owns:** the product catalog, stored in `catalogdb`.
 
-**Projects touched:** `Catalog.Api`.
-
-**Verify:**
-- Build.
-- Aspire run.
-- HTTP: `GET /products` returns the seeded list; `GET /products/{id}` returns a known product and 404 for a bad id.
+Specs in `_agenticdev/microservices/catalog-api/`:
+1. `01-persistence.md`
+2. `02-seed-products.md`
+3. `03-list-products.md`
+4. `04-get-product.md`
 
 ### 3b. Ordering.Api
 
-**Tasks:**
-1. Implement `POST /orders` — create order + child order items from `buyerId` + items payload, compute `Total`, return created order with id.
-2. Implement `GET /orders/{id}` — single order with items, 404 if missing.
-3. Implement `GET /orders?buyerId=demo-user` — list orders for buyer, newest first.
+**Owns:** placed orders and their line items, stored in `orderingdb`.
 
-**Projects touched:** `Ordering.Api`.
+Specs in `_agenticdev/microservices/ordering-api/`:
+1. `01-persistence.md`
+2. `02-create-order.md`
+3. `03-get-order.md`
+4. `04-list-orders.md`
 
-**Verify:**
-- Build.
-- Aspire run.
-- HTTP: `POST /orders` with a sample payload returns a created order with correct computed total; `GET /orders/{id}` returns it; `GET /orders?buyerId=demo-user` lists it first.
+### 3c. Basket.Api
 
-### 3c. Basket.Api (standalone endpoints only — no Catalog/Ordering calls yet)
+**Owns:** the demo user's basket in Redis, and checkout orchestration (calls Catalog.Api to add items and Ordering.Api to check out).
 
-**Tasks:**
-1. Implement `GET /baskets/demo-user` — read basket from Redis, return empty basket shape if none exists.
-2. Implement basket read/write helpers against Redis using the JSON shape from PROJECT.md (no external HTTP calls yet — add item endpoint stores a caller-supplied snapshot directly, as a placeholder ahead of Step 4's real Catalog lookup).
-
-**Projects touched:** `Basket.Api`.
-
-**Verify:**
-- Build.
-- Aspire run.
-- HTTP: `GET /baskets/demo-user` returns an empty basket initially; writing a basket directly to Redis (or via the placeholder add) and re-reading confirms round-trip.
+Specs in `_agenticdev/microservices/basket-api/`:
+1. `01-redis-connection.md`
+2. `02-get-basket.md`
+3. `03-add-item.md`
+4. `04-checkout.md`
 
 ---
 
 ## Step 4 — Service communication
 
-Wire the real cross-service calls: Basket.Api resolving products from Catalog.Api, and the full checkout orchestration against Ordering.Api. This is where Aspire service discovery and `HttpClient` wiring matter most.
-
-**Tasks:**
-1. Add an `HttpClient` in `Basket.Api` configured for Aspire service discovery to `Catalog.Api` (e.g. `https+http://catalogapi`).
-2. Implement `POST /baskets/demo-user/items`: call `GET /products/{id}` on Catalog.Api to snapshot name/price, then add-or-increment the item in the Redis basket.
-3. Add an `HttpClient` in `Basket.Api` for Aspire service discovery to `Ordering.Api`.
-4. Implement `POST /baskets/demo-user/checkout`: read basket from Redis → error if empty → `POST /orders` on Ordering.Api with buyerId + items → delete the Redis basket key → return the new order id.
-5. Update `EshopClaude.AppHost` wiring so `Basket.Api` has `WithReference`/`WaitFor` on both `Catalog.Api` and `Ordering.Api`.
-
-**Projects touched:** `Basket.Api`, `EshopClaude.AppHost`.
-
-**Verify:**
-- Build.
-- Aspire run.
-- HTTP: `POST /baskets/demo-user/items` with a valid productId adds a correctly-priced/named item; repeating it increments quantity instead of duplicating.
-- HTTP: `POST /baskets/demo-user/checkout` on a populated basket creates an order in Ordering.Api (confirm via `GET /orders/{id}`) and empties the basket (confirm via `GET /baskets/demo-user`); checkout on an empty basket returns an error.
-- Traces: inspect the Aspire dashboard trace for a checkout call — confirm it shows the Basket.Api → Catalog.Api (add-item) and Basket.Api → Ordering.Api (checkout) hops.
+Covered by the Basket.Api specs: `03-add-item.md` (Basket.Api → Catalog.Api) and `04-checkout.md` (Basket.Api → Ordering.Api). There is no separate work in this step.
 
 ---
 
