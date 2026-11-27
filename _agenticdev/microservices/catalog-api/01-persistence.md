@@ -1,6 +1,6 @@
 # Catalog.Api — 01 — Persistence
 
-**Status:** Not started
+**Status:** Done
 
 ## Goal
 
@@ -36,10 +36,10 @@ No max lengths, no indexes beyond the primary key, and no other columns.
 
 ## Scope
 
-- [ ] Product entity with the fields listed in PROJECT.md.
-- [ ] `CatalogDbContext` registered with `AddNpgsqlDbContext` against `catalogdb`.
-- [ ] AppHost: Catalog.Api gets `WithReference(catalogdb)` + `WaitFor(catalogdb)`.
-- [ ] Create the schema at startup.
+- [x] Product entity with the fields listed in PROJECT.md.
+- [x] `CatalogDbContext` registered with `AddNpgsqlDbContext` against `catalogdb`.
+- [x] AppHost: Catalog.Api gets `WithReference(catalogdb)` + `WaitFor(catalogdb)`.
+- [x] Create the schema at startup.
 
 ## Explicit non-goals
 
