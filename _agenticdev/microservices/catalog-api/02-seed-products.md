@@ -1,6 +1,6 @@
 # Catalog.Api — 02 — Seed products
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -33,8 +33,8 @@ catalog-api/01-persistence
 
 ## Scope
 
-- [ ] Seed 6–8 products (name, description, price, image URL) at startup.
-- [ ] Seed only when the products table is empty.
+- [x] Seed 6–8 products (name, description, price, image URL) at startup.
+- [x] Seed only when the products table is empty.
 
 ## Explicit non-goals
 
