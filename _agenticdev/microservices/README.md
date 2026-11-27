@@ -5,7 +5,7 @@ One spec = one sub-feature = one feature branch. Rules: `_agenticdev/WOW.md`. Ea
 | Service | Spec | Branch | Status |
 |---|---|---|---|
 | catalog-api | [01-persistence](catalog-api/01-persistence.md) | `feature/catalog-01-persistence` | Done |
-| catalog-api | [02-seed-products](catalog-api/02-seed-products.md) | `feature/catalog-api-02-seed-products` | Not started |
+| catalog-api | [02-seed-products](catalog-api/02-seed-products.md) | `feature/catalog-02-seed-products` | In progress |
 | catalog-api | [03-list-products](catalog-api/03-list-products.md) | `feature/catalog-api-03-list-products` | Not started |
 | catalog-api | [04-get-product](catalog-api/04-get-product.md) | `feature/catalog-api-04-get-product` | Not started |
 | ordering-api | [01-persistence](ordering-api/01-persistence.md) | `feature/ordering-api-01-persistence` | Not started |
