@@ -1,6 +1,6 @@
 # Catalog.Api — 04 — Get product
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -18,8 +18,8 @@ catalog-api/03-list-products
 
 ## Scope
 
-- [ ] `GET /products/{id}` returns one product.
-- [ ] Return 404 when the id doesn't exist.
+- [x] `GET /products/{id}` returns one product.
+- [x] Return 404 when the id doesn't exist.
 
 ## Explicit non-goals
 
