@@ -1,6 +1,6 @@
 # Ordering.Api — 01 — Persistence
 
-**Status:** Not started
+**Status:** Done (87072fab5adb0627255df9eaa94eaa330fab858a)
 
 ## Goal
 
@@ -52,10 +52,10 @@ Entity `OrderItem` maps to table `OrderItems`.
 
 ## Scope
 
-- [ ] Order and OrderItem entities with the fields listed in PROJECT.md (OrderItem is a child of Order).
-- [ ] `OrderingDbContext` registered with `AddNpgsqlDbContext` against `orderingdb`.
-- [ ] AppHost: Ordering.Api gets `WithReference(orderingdb)` + `WaitFor(orderingdb)`.
-- [ ] Create the schema at startup.
+- [x] Order and OrderItem entities with the fields listed in PROJECT.md (OrderItem is a child of Order).
+- [x] `OrderingDbContext` registered with `AddNpgsqlDbContext` against `orderingdb`.
+- [x] AppHost: Ordering.Api gets `WithReference(orderingdb)` + `WaitFor(orderingdb)`.
+- [x] Create the schema at startup.
 
 ## Explicit non-goals
 

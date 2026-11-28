@@ -8,7 +8,7 @@ One spec = one sub-feature = one feature branch. Rules: `_agenticdev/WOW.md`. Ea
 | catalog-api | [02-seed-products](catalog-api/02-seed-products.md) | `feature/catalog-02-seed-products` | Done |
 | catalog-api | [03-list-products](catalog-api/03-list-products.md) | `feature/catalog-03-list-products` | Done |
 | catalog-api | [04-get-product](catalog-api/04-get-product.md) | `feature/catalog-04-get-product` | Done |
-| ordering-api | [01-persistence](ordering-api/01-persistence.md) | `feature/ordering-api-01-persistence` | Not started |
+| ordering-api | [01-persistence](ordering-api/01-persistence.md) | `feature/ordering-api-01-persistence` | Done |
 | ordering-api | [02-create-order](ordering-api/02-create-order.md) | `feature/ordering-api-02-create-order` | Not started |
 | ordering-api | [03-get-order](ordering-api/03-get-order.md) | `feature/ordering-api-03-get-order` | Not started |
 | ordering-api | [04-list-orders](ordering-api/04-list-orders.md) | `feature/ordering-api-04-list-orders` | Not started |
