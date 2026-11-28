@@ -14,7 +14,7 @@ var postgres = builder.AddPostgres("postgres")
     });
 
 var catalogdb = postgres.AddDatabase("catalogdb");
-postgres.AddDatabase("orderingdb");
+var orderingdb = postgres.AddDatabase("orderingdb");
 
 builder.AddRedis("redis");
 
@@ -27,6 +27,8 @@ builder.AddDotnetProject("basketapi", "../EshopClaude.Basket.Api/EshopClaude.Bas
     .WithHttpHealthCheck("/health");
 
 builder.AddDotnetProject("orderingapi", "../EshopClaude.Ordering.Api/EshopClaude.Ordering.Api.csproj")
+    .WithReference(orderingdb)
+    .WaitFor(orderingdb)
     .WithHttpHealthCheck("/health");
 
 builder.AddDotnetProject("webfrontend", "../EshopClaude.Web/EshopClaude.Web.csproj")
